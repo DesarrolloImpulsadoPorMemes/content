@@ -5,6 +5,10 @@ on:
     # Se ejecuta a las 5:00 AM UTC
     - cron: '0 5 * * *'
   
+  push:
+    branches:
+      - main
+  
   workflow_dispatch:
 
 jobs:
