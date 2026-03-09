@@ -2,7 +2,9 @@
 import { getCollection } from "astro:content";
 const now = new Date();
 const posts = await getCollection("posts", ({ data }) => {
-    return data.published && data.date <= now;
+    const isPublished = data.published;
+    const isDatePassed = data.date.getTime() <= now.getTime();
+    return isPublished && isDatePassed;
 });
 ---
 
