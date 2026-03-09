@@ -1,8 +1,8 @@
 export const SITE = {
-  name: 'DesarrolloImpulsadaPorMemes',
-  title: 'DesarrolloImpulsadaPorMemes — Memes de Programación',
+  name: 'DesarrolloImpulsadoPorMemes',
+  title: 'DesarrolloImpulsadoPorMemes — Memes de Programación',
   description: 'El repositorio definitivo de humor para devs. Encuentra los mejores memes sobre la vida de los programadores, bugs en producción, café y por supuesto risas. Desarrollo impulsado por memes, literalmente.',
-  author: 'DesarrolloImpulsadaPorMemes',
+  author: 'DesarrolloImpulsadoPorMemes',
   url: 'https://desarrolloimpulsadopormemes.github.io',
 };
 
