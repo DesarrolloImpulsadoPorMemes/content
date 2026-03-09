@@ -1,0 +1,311 @@
+<div id="modal" class="modal-overlay">
+    <div class="modal-content glass">
+        <button class="close-btn" aria-label="Cerrar">&times;</button>
+
+        <!-- Navigation Buttons -->
+        <button class="nav-btn prev" aria-label="Anterior">&#8249;</button>
+        <button class="nav-btn next" aria-label="Siguiente">&#8250;</button>
+
+        <div class="modal-body">
+            <div class="modal-image">
+                <img id="modal-img" src="" alt="" />
+            </div>
+            <div class="modal-info">
+                <h2 id="modal-title"></h2>
+                <p id="modal-copy" class="copy"></p>
+                <div class="modal-meta">
+                    <span id="modal-date"></span>
+                    <span id="modal-category" class="badge"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(26, 43, 52, 0.85); /* Petroleum blue overlay */
+        backdrop-filter: blur(8px);
+        display: none;
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+        padding: 1.5rem;
+        opacity: 0;
+        transition: opacity 0.2s ease-in;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .modal-content {
+        background: var(--surface);
+        max-width: 1100px;
+        width: 100%;
+        max-height: 90vh;
+        border-radius: 16px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transform: scale(0.95) translateY(20px);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* Ease-out */
+    }
+
+    .modal-overlay.active .modal-content {
+        transform: scale(1) translateY(0);
+    }
+
+    /* Closing state animation */
+    .modal-overlay.closing {
+        opacity: 0;
+        transition: opacity 0.3s ease-in;
+    }
+
+    .modal-overlay.closing .modal-content {
+        transform: scale(0.95);
+        transition: transform 0.3s ease-in;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(0, 0, 0, 0.3);
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 20;
+        transition: var(--transition);
+    }
+
+    .close-btn:hover {
+        background: var(--accent);
+        transform: rotate(90deg);
+    }
+
+    /* Navigation Buttons Styling */
+    .nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.4);
+        color: white;
+        border: none;
+        width: 50px;
+        height: 50px;
+        font-size: 2rem;
+        cursor: pointer;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        transition: var(--transition);
+        opacity: 0.6;
+    }
+
+    .nav-btn:hover {
+        opacity: 1;
+        background: var(--accent);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .nav-btn.prev {
+        left: 1.5rem;
+    }
+    .nav-btn.next {
+        right: 1.5rem;
+    }
+
+    .nav-btn.disabled {
+        display: none;
+    }
+
+    .modal-body {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        height: 100%;
+        min-height: 500px;
+    }
+
+    .modal-image {
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .modal-image img {
+        max-width: 100%;
+        max-height: 90vh;
+        object-fit: contain;
+    }
+
+    .modal-info {
+        padding: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        background: var(--surface);
+    }
+
+    #modal-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--fg);
+        line-height: 1.2;
+    }
+
+    .copy {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--fg);
+        opacity: 0.9;
+    }
+
+    .modal-meta {
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.85rem;
+    }
+
+    .badge {
+        background: var(--secondary);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    @media (max-width: 850px) {
+        .modal-body {
+            grid-template-columns: 1fr;
+            overflow-y: auto;
+        }
+        .modal-content {
+            max-height: 95vh;
+        }
+        .modal-image {
+            border-right: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .modal-info {
+            padding: 1.5rem;
+        }
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+        }
+        .nav-btn.prev {
+            left: 0.5rem;
+        }
+        .nav-btn.next {
+            right: 0.5rem;
+        }
+    }
+</style>
+
+<script>
+    const modal = document.getElementById("modal");
+    const closeBtn = modal?.querySelector(".close-btn");
+    const prevBtn = modal?.querySelector(".nav-btn.prev");
+    const nextBtn = modal?.querySelector(".nav-btn.next");
+
+    let currentPosts = [];
+    let currentIndex = -1;
+
+    const updateModalDisplay = (index) => {
+        if (index < 0 || index >= currentPosts.length) return;
+
+        currentIndex = index;
+        const data = currentPosts[index];
+
+        const img = document.getElementById("modal-img") as HTMLImageElement;
+        const title = document.getElementById("modal-title");
+        const copy = document.getElementById("modal-copy");
+        const date = document.getElementById("modal-date");
+        const category = document.getElementById("modal-category");
+
+        if (img) img.src = data.image;
+        if (title) title.innerText = data.title || "Meme Post";
+        if (copy) copy.innerText = data.copy || "";
+        if (date) date.innerText = new Date(data.date).toLocaleDateString();
+        if (category) category.innerText = data.category;
+
+        // Update nav buttons visibility
+        if (prevBtn) prevBtn.classList.toggle("disabled", index === 0);
+        if (nextBtn)
+            nextBtn.classList.toggle(
+                "disabled",
+                index === currentPosts.length - 1,
+            );
+    };
+
+    const closeModal = () => {
+        if (!modal) return;
+        modal.classList.add("closing");
+        setTimeout(() => {
+            modal.classList.remove("active", "closing");
+            document.body.style.overflow = "auto";
+        }, 300);
+    };
+
+    const openModal = (detail) => {
+        if (!modal) return;
+        currentPosts = detail.posts;
+        updateModalDisplay(detail.currentIndex);
+
+        modal.classList.remove("closing");
+        modal.classList.add("active");
+        document.body.style.overflow = "hidden";
+    };
+
+    // Expose globally
+    (window as any).openMemeModal = openModal;
+
+    window.addEventListener("open-modal", ((e: CustomEvent) => {
+        openModal(e.detail);
+    }) as EventListener);
+
+    closeBtn?.addEventListener("click", closeModal);
+    prevBtn?.addEventListener("click", () =>
+        updateModalDisplay(currentIndex - 1),
+    );
+    nextBtn?.addEventListener("click", () =>
+        updateModalDisplay(currentIndex + 1),
+    );
+
+    modal?.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    window.addEventListener("keydown", (e) => {
+        if (!modal?.classList.contains("active")) return;
+
+        if (e.key === "Escape") closeModal();
+        if (e.key === "ArrowLeft") updateModalDisplay(currentIndex - 1);
+        if (e.key === "ArrowRight") updateModalDisplay(currentIndex + 1);
+    });
+</script>

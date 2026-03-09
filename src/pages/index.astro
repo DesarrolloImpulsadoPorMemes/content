@@ -1,0 +1,89 @@
+---
+import { SITE } from "../config";
+import Navbar from "../components/Navbar.astro";
+import Hero from "../components/Hero.astro";
+import MasonryGrid from "../components/MasonryGrid.astro";
+import Modal from "../components/Modal.astro";
+import SEO from "../components/SEO.astro";
+import "../index.css";
+---
+
+<html lang="es">
+    <head>
+        <SEO />
+
+        <!-- Google Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <Navbar name={SITE.name} />
+        <Hero />
+
+        <main>
+            <section class="section-header container">
+                <h2 class="neon-text">Últimos Memes</h2>
+                <p>Actualización constante desde el core.</p>
+            </section>
+
+            <MasonryGrid />
+        </main>
+
+        <footer class="glass">
+            <div class="container footer-content">
+                <p>
+                    &copy; {new Date().getFullYear()}
+                    {SITE.name} — Hecho con ☕ y 💩
+                </p>
+            </div>
+        </footer>
+
+        <Modal />
+
+        <style is:global>
+            .section-header {
+                text-align: center;
+                padding: 4rem 1rem 2rem;
+            }
+
+            .neon-text {
+                font-size: clamp(2rem, 8vw, 3.5rem); /* Responsive font size */
+                color: var(--primary);
+                text-shadow: 0 0 20px rgba(18, 52, 63, 0.2);
+                margin-bottom: 0.5rem;
+                line-height: 1.1;
+            }
+
+            .section-header p {
+                opacity: 0.7;
+                font-size: 1rem;
+            }
+
+            footer {
+                margin-top: 5rem;
+                padding: 4rem 1rem;
+                text-align: center;
+                border-top: 1px solid rgba(0, 0, 0, 0.05);
+            }
+
+            [data-theme="dark"] footer {
+                border-top: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .footer-content p {
+                opacity: 0.4;
+                font-weight: 500;
+                font-size: 0.75rem;
+                letter-spacing: 1px;
+            }
+        </style>
+    </body>
+</html>

@@ -1,0 +1,153 @@
+---
+import { getCollection } from "astro:content";
+import { SITE } from "../config";
+import SEO from "../components/SEO.astro";
+import "../index.css";
+
+const allPosts = await getCollection("posts", ({ data }) => data.published);
+const randomMeme = allPosts[Math.floor(Math.random() * allPosts.length)];
+---
+
+<html lang="es">
+    <head>
+        <SEO
+            title={`404 - Meme No Encontrado | ${SITE.name}`}
+            description="Parece que te has perdido en el código. Relájate con un meme y vuelve al inicio en unos segundos."
+        />
+        <meta http-equiv="refresh" content="5;url=/" />
+    </head>
+    <body class="error-page">
+        <main class="container">
+            <div class="error-content">
+                <h1 class="neon-text">404</h1>
+                <p class="error-msg">
+                    Código 404: Misión fallida. Este meme no existe (aún).
+                </p>
+
+                {
+                    randomMeme && (
+                        <div class="random-meme">
+                            <img
+                                src={randomMeme.data.image}
+                                alt="Meme aleatorio"
+                            />
+                            <p class="caption">
+                                Mientras esperas, aquí tienes un regalo del
+                                sistema.
+                            </p>
+                        </div>
+                    )
+                }
+
+                <div class="redirect-notice">
+                    <div class="loader-bar"></div>
+                    <p>
+                        Redirigiendo al inicio en <span id="countdown">5</span> segundos...
+                    </p>
+                </div>
+
+                <a href="/" class="back-home">Volver ahora mismo</a>
+            </div>
+        </main>
+
+        <style>
+            .error-page {
+                height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--bg);
+                text-align: center;
+            }
+
+            .error-content {
+                max-width: 600px;
+                padding: 2rem;
+            }
+
+            .neon-text {
+                font-size: 8rem;
+                margin: 0;
+                line-height: 1;
+            }
+
+            .error-msg {
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 2rem;
+                color: var(--primary);
+            }
+
+            .random-meme {
+                margin: 2rem 0;
+                border-radius: 12px;
+                overflow: hidden;
+                background: var(--surface);
+                box-shadow: var(--card-shadow);
+                padding: 1rem;
+            }
+
+            .random-meme img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 8px;
+            }
+
+            .caption {
+                margin-top: 1rem;
+                font-style: italic;
+                opacity: 0.7;
+                font-size: 0.9rem;
+            }
+
+            .redirect-notice {
+                margin-top: 3rem;
+            }
+
+            .loader-bar {
+                height: 4px;
+                background: var(--accent);
+                width: 100%;
+                border-radius: 2px;
+                margin-bottom: 1rem;
+                animation: shrink 5s linear forwards;
+            }
+
+            .back-home {
+                display: inline-block;
+                margin-top: 2rem;
+                padding: 0.75rem 1.5rem;
+                background: var(--primary);
+                color: var(--bg);
+                border-radius: 8px;
+                font-weight: 700;
+                transition: var(--transition);
+            }
+
+            .back-home:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            @keyframes shrink {
+                from {
+                    width: 100%;
+                }
+                to {
+                    width: 0%;
+                }
+            }
+        </style>
+
+        <script>
+            let seconds = 5;
+            const countdownEl = document.getElementById("countdown");
+
+            const interval = setInterval(() => {
+                seconds--;
+                if (countdownEl) countdownEl.innerText = seconds.toString();
+                if (seconds <= 0) clearInterval(interval);
+            }, 1000);
+        </script>
+    </body>
+</html>

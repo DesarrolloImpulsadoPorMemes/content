@@ -1,0 +1,38 @@
+name: Scheduled Deploy
+
+on:
+  schedule:
+    # Se ejecuta a las 5:00 AM UTC
+    - cron: '0 5 * * *'
+  
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+
+      - name: Pushing to target repository
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-directory: 'dist'
+          destination-github-username: 'TU_USUARIO'
+          destination-repository-name: 'TU_REPO_PROD'
+          user-email: tu-email@gmail.com
+          target-branch: main

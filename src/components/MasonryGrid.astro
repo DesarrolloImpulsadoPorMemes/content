@@ -1,0 +1,203 @@
+---
+import { getCollection } from "astro:content";
+const posts = await getCollection("posts", ({ data }) => data.published);
+---
+
+<section id="grid" class="container">
+    <div id="masonry-root">
+        {
+            posts.map((post, index) => (
+                <div
+                    class="grid-item"
+                    data-post={JSON.stringify(post.data)}
+                    data-index={index}
+                >
+                    <div class="meme-wrapper">
+                        <img
+                            src={post.data.image}
+                            alt={post.data.imageAlt || post.data.title}
+                            loading="lazy"
+                        />
+                        <div class="hover-overlay">
+                            <span>Ver detalle</span>
+                        </div>
+                    </div>
+                </div>
+            ))
+        }
+    </div>
+</section>
+
+<style>
+    #grid {
+        padding: 2rem 0;
+    }
+
+    #masonry-root {
+        column-count: 3;
+        column-gap: 1.5rem;
+        width: 100%;
+    }
+
+    .grid-item {
+        break-inside: avoid;
+        margin-bottom: 1.5rem;
+        display: block;
+        cursor: pointer;
+    }
+
+    .meme-wrapper {
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: var(--transition);
+        background: var(--surface);
+        margin: 1rem;
+        min-height: 200px; /* Base height for skeleton */
+    }
+
+    /* Skeleton Loader */
+    .meme-wrapper::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.05),
+            transparent
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        z-index: 1;
+        display: block;
+    }
+
+    .meme-wrapper.loaded::before {
+        display: none;
+    }
+
+    @keyframes shimmer {
+        0% {
+            background-position: -200% 0;
+        }
+        100% {
+            background-position: 200% 0;
+        }
+    }
+
+    .meme-wrapper img {
+        width: 100%;
+        display: block;
+        transition: var(--transition);
+        opacity: 0; /* Hidden until loaded */
+    }
+
+    .meme-wrapper.loaded img {
+        opacity: 1;
+    }
+
+    .meme-wrapper:hover {
+        transform: scale(1.02);
+        box-shadow: var(--card-shadow);
+    }
+
+    .hover-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(26, 43, 52, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: var(--transition);
+    }
+
+    .meme-wrapper:hover .hover-overlay {
+        opacity: 1;
+    }
+
+    .hover-overlay span {
+        color: white;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: 2px solid white;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+    }
+
+    @media (max-width: 1024px) {
+        #masonry-root {
+            column-count: 2;
+        }
+    }
+
+    @media (max-width: 640px) {
+        #masonry-root {
+            column-count: 1;
+            column-gap: 0;
+        }
+        .grid-item {
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+
+<script>
+    const setupGrid = () => {
+        const container = document.getElementById("masonry-root");
+        if (!container) return;
+
+        // Image load detection for skeletons
+        const wrappers = container.querySelectorAll(".meme-wrapper");
+        wrappers.forEach((wrapper) => {
+            const img = wrapper.querySelector("img");
+            if (img) {
+                if (img.complete) {
+                    wrapper.classList.add("loaded");
+                } else {
+                    img.addEventListener("load", () =>
+                        wrapper.classList.add("loaded"),
+                    );
+                }
+            }
+        });
+
+        // Click handler using event delegation
+        container.addEventListener("click", (e) => {
+            const item = (e.target as HTMLElement).closest(".grid-item");
+            if (item) {
+                const index = parseInt(item.getAttribute("data-index") || "0");
+                const allItems = container.querySelectorAll(".grid-item");
+                const postsData = Array.from(allItems).map((el) =>
+                    JSON.parse(el.getAttribute("data-post") || "{}"),
+                );
+
+                console.log("Opening modal at index:", index);
+
+                const detail = { posts: postsData, currentIndex: index };
+
+                if (window.openMemeModal) {
+                    window.openMemeModal(detail);
+                } else {
+                    window.dispatchEvent(
+                        new CustomEvent("open-modal", { detail }),
+                    );
+                }
+            }
+        });
+    };
+
+    // Run on init and Astro transitions
+    setupGrid();
+    document.addEventListener("astro:page-load", setupGrid);
+    document.addEventListener("astro:after-swap", setupGrid);
+</script>
