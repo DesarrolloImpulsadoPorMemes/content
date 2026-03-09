@@ -3,7 +3,7 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://DesarrolloImpulsadaPorMemes.com',
+  site: 'https://desarrolloimpulsadopormemes.github.io',
   base: '/',
   integrations: [mdx(), sitemap()],
   markdown: {
