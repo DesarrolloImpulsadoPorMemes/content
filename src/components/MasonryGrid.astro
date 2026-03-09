@@ -1,6 +1,9 @@
 ---
 import { getCollection } from "astro:content";
-const posts = await getCollection("posts", ({ data }) => data.published);
+const now = new Date();
+const posts = await getCollection("posts", ({ data }) => {
+    return data.published && data.date <= now;
+});
 ---
 
 <section id="grid" class="container">
