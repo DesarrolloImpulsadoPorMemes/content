@@ -5,6 +5,7 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  imageAlt?: string;
   canonicalURL?: URL | string;
   type?: "website" | "article";
 }
@@ -13,6 +14,7 @@ const {
   title = SITE.title,
   description = SITE.description,
   image = "/images/logo.png",
+  imageAlt = SITE.title,
   canonicalURL = Astro.url,
   type = "website",
 } = Astro.props;
@@ -43,6 +45,7 @@ const {
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={new URL(image, Astro.url)} />
+<meta property="og:image:alt" content={imageAlt} />
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
@@ -50,6 +53,7 @@ const {
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={new URL(image, Astro.url)} />
+<meta property="twitter:image:alt" content={imageAlt} />
 
 <!-- Theme color selection -->
 <meta name="theme-color" content="#1A2B34" />

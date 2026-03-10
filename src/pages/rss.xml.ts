@@ -5,26 +5,28 @@ import { SITE } from '../config';
 export async function GET(context: any) {
   const now = new Date();
   const posts = await getCollection('posts', ({ data }) => {
-    return data.published && data.date <= now;
+    return data.published && data.date.getTime() <= now.getTime();
   });
   
   return rss({
     title: SITE.title,
     description: SITE.description,
     site: context.site || SITE.url,
+    xmlns: {
+      media: 'http://search.yahoo.com/mrss/',
+      content: 'http://purl.org/rss/1.0/modules/content/',
+    },
     items: posts.map((post) => ({
       title: post.data.title,
       pubDate: post.data.date,
-      description: `
-        ${post.data.copy ? `<p>${post.data.copy}</p>` : ''}
-        <img src="${new URL(post.data.image, SITE.url)}" alt="${post.data.imageAlt || post.data.title}" />
+      description: post.data.copy || '',
+      link: `${SITE.url}`, // Todos los memes están en el home grid
+      content: post.data.copy || '',
+      customData: `
+        <media:content url="${new URL(post.data.image, SITE.url)}" medium="image" type="image/png">
+          <media:description type="plain">${post.data.imageAlt || post.data.title}</media:description>
+        </media:content>
       `,
-      link: `/`,
-      enclosure: {
-        url: new URL(post.data.image, SITE.url).toString(),
-        type: 'image/png',
-        length: 0
-      }
     })),
     customData: `<language>es-es</language>`,
   });
