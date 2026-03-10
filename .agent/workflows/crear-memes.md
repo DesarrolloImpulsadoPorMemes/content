@@ -23,7 +23,7 @@ Este workflow debe activarse cada vez que el usuario suba nuevas imágenes a `pu
 
 4.  **Redacción del Cuerpo (Body)**:
     - Escribir 2 o 3 párrafos expandiendo el chiste técnico.
-    - Usar negritas para conceptos clave y un tono de "colega programador".
+    - **IMPORTANTE**: Usar exclusivamente texto plano. No usar asteriscos, negritas (`**`), cursivas o cualquier otro formato Markdown.
 
 5.  **Ejecución y Limpieza**:
     - Crear el archivo `.mdx` en `src/content/posts/` con un slug amigable.
