@@ -16,18 +16,27 @@ export async function GET(context: any) {
       media: 'http://search.yahoo.com/mrss/',
       content: 'http://purl.org/rss/1.0/modules/content/',
     },
-    items: posts.map((post) => ({
-      title: post.data.title,
-      pubDate: post.data.date,
-      description: post.data.copy || '',
-      link: `${SITE.url}`, // Todos los memes están en el home grid
-      content: post.data.copy || '',
-      customData: `
-        <media:content url="${new URL(post.data.image, SITE.url)}" medium="image" type="image/png">
-          <media:description type="plain">${post.data.imageAlt || post.data.title}</media:description>
-        </media:content>
-      `,
-    })),
+    items: posts.map((post) => {
+      // Formatear el cuerpo para usar <br/> en lugar de saltos de línea planos
+      const bodyContent = post.body ? post.body
+        .trim()
+        .replace(/\r\n/g, '\n')
+        .replace(/\n\n/g, '<br/><br/>')
+        .replace(/\n/g, '<br/>') : post.data.copy || '';
+
+      return {
+        title: post.data.title,
+        pubDate: post.data.date,
+        description: post.data.copy || '',
+        link: `${SITE.url}`,
+        content: bodyContent,
+        customData: `
+          <media:content url="${new URL(post.data.image, SITE.url)}" medium="image" type="image/png">
+            <media:description type="plain">${post.data.imageAlt || post.data.title}</media:description>
+          </media:content>
+        `,
+      };
+    }),
     customData: `<language>es-es</language>`,
   });
 }
