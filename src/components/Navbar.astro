@@ -7,7 +7,7 @@ import { SOCIALS } from "../config";
         <div class="logo">
             <a href="/" class="logo-link">
                 <img src="/images/logo.png" alt="Logo" class="nav-logo-img" />
-                <span class="logo-text">ProgramacionImpulsadoPorMemes</span>
+                <span class="logo-text">ProgramacionImpulsadaPorMemes</span>
             </a>
         </div>
 
@@ -180,6 +180,12 @@ import { SOCIALS } from "../config";
             </div>
 
             <div class="utility-icons">
+                <button id="random-meme" class="icon-btn" aria-label="Meme aleatorio" title="Meme aleatorio">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"></path><path d="m18 2 4 4-4 4"></path><path d="M2 6h1.9c1.2 0 2.3.6 3 1.5l3.8 5.4"></path><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"></path><path d="m18 14 4 4-4 4"></path></svg>
+                </button>
+                <button id="submit-meme" class="icon-btn" aria-label="Sube tu meme" title="Sube tu meme">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
                 <a href="/rss.xml" class="icon-btn" aria-label="RSS Feed">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -254,7 +260,98 @@ import { SOCIALS } from "../config";
     </div>
 </nav>
 
+<!-- Modal de Contribución Minimalista -->
+<div id="contribute-modal" class="contrib-overlay">
+    <div class="contrib-content glass">
+        <button class="close-contrib">&times;</button>
+        <h3>¡Suma tu humor dev! 🚀</h3>
+        <p>Aporta tus memes al repositorio oficial de Programación Impulsada por Memes.</p>
+        <div class="contrib-steps">
+            <div class="step">
+                <span class="step-num">1</span>
+                <p>Sube tu imagen a <code>/public/images/content/</code></p>
+            </div>
+            <div class="step">
+                <span class="step-num">2</span>
+                <p>Crea el post MDX en <code>/src/content/posts/</code></p>
+            </div>
+        </div>
+        <a href="https://github.com/tu-usuario/repo/blob/main/CONTRIBUTING.md" target="_blank" class="btn-primary">Ver guía completa</a>
+    </div>
+</div>
+
 <style>
+    .icon-btn#submit-meme:hover {
+        background: var(--accent);
+        color: white;
+    }
+
+    .contrib-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        display: none;
+        z-index: 3000;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem;
+    }
+    .contrib-overlay.active { display: flex; }
+    .contrib-content {
+        background: var(--surface);
+        padding: 2.5rem;
+        border-radius: 12px;
+        max-width: 450px;
+        width: 100%;
+        position: relative;
+        text-align: center;
+    }
+    .close-contrib {
+        position: absolute;
+        top: 0.5rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        color: var(--fg);
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+    .contrib-steps {
+        margin: 1.5rem 0;
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .step { display: flex; align-items: center; gap: 1rem; }
+    .step-num {
+        background: var(--accent);
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+    .btn-primary {
+        display: inline-block;
+        background: var(--primary);
+        color: var(--bg);
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 700;
+        margin-top: 1rem;
+        transition: var(--transition);
+    }
+    .btn-primary:hover { transform: translateY(-2px); opacity: 0.9; }
+
     .navbar {
         position: sticky;
         top: 0;
@@ -382,22 +479,46 @@ import { SOCIALS } from "../config";
 </style>
 
 <script>
-    const setupTheme = () => {
-        const toggle = document.getElementById("theme-toggle");
-        if (toggle) {
-            toggle.onclick = () => {
-                const currentTheme =
-                    document.documentElement.getAttribute("data-theme");
+    const setupNavbar = () => {
+        const themeToggle = document.getElementById("theme-toggle");
+        const randomBtn = document.getElementById("random-meme");
+        const submitBtn = document.getElementById("submit-meme");
+        const contribModal = document.getElementById("contribute-modal");
+        const closeContrib = contribModal?.querySelector(".close-contrib");
+
+        if (themeToggle) {
+            themeToggle.onclick = () => {
+                const currentTheme = document.documentElement.getAttribute("data-theme");
                 const targetTheme = currentTheme === "dark" ? "light" : "dark";
-                document.documentElement.setAttribute(
-                    "data-theme",
-                    targetTheme,
-                );
+                document.documentElement.setAttribute("data-theme", targetTheme);
                 localStorage.setItem("theme", targetTheme);
             };
         }
+
+        if (randomBtn) {
+            randomBtn.onclick = () => {
+                const items = document.querySelectorAll('.grid-item');
+                if (items.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * items.length);
+                    const randomItem = items[randomIndex] as HTMLElement;
+                    randomItem.click();
+                }
+            };
+        }
+
+        if (submitBtn && contribModal) {
+            submitBtn.onclick = () => contribModal.classList.add("active");
+        }
+
+        if (closeContrib && contribModal) {
+            closeContrib.onclick = () => contribModal.classList.remove("active");
+        }
+
+        contribModal?.addEventListener("click", (e) => {
+            if (e.target === contribModal) contribModal.classList.remove("active");
+        });
     };
 
-    setupTheme();
-    document.addEventListener("astro:page-load", setupTheme);
+    setupNavbar();
+    document.addEventListener("astro:page-load", setupNavbar);
 </script>

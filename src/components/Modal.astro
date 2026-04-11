@@ -17,6 +17,21 @@
                     <span id="modal-date"></span>
                     <span id="modal-category" class="badge"></span>
                 </div>
+                
+                <div class="modal-share">
+                    <p>Compartir:</p>
+                    <div class="share-buttons">
+                        <button id="share-linkedin" class="share-btn linkedin" title="Compartir en LinkedIn">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                        </button>
+                        <button id="share-telegram" class="share-btn telegram" title="Compartir en Telegram">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm4.462 8.357l-1.554 7.339c-.117.518-.424.647-.857.406l-2.37-1.745-1.144 1.1c-.126.126-.232.232-.472.232l.169-2.407 4.382-3.958c.19-.169-.041-.263-.294-.094l-5.417 3.411-2.333-.73c-.507-.158-.517-.507.108-.752l9.105-3.505c.421-.155.79.096.658.653z"/></svg>
+                        </button>
+                        <button id="share-copy" class="share-btn copy-link" title="Copiar enlace directo">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -198,6 +213,47 @@
         text-transform: uppercase;
     }
 
+    .modal-share {
+        margin-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 1rem;
+    }
+    
+    .modal-share p {
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.6;
+    }
+    
+    .share-buttons {
+        display: flex;
+        gap: 0.75rem;
+    }
+    
+    .share-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--fg);
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .share-btn:hover {
+        background: var(--accent);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .share-btn.linkedin:hover { background: #0077b5; }
+    .share-btn.telegram:hover { background: #0088cc; }
+    .share-btn.copy-link:hover { background: var(--secondary); }
+
     @media (max-width: 850px) {
         .modal-body {
             grid-template-columns: 1fr;
@@ -232,6 +288,9 @@
     const closeBtn = modal?.querySelector(".close-btn");
     const prevBtn = modal?.querySelector(".nav-btn.prev");
     const nextBtn = modal?.querySelector(".nav-btn.next");
+    const shareLinkedin = document.getElementById("share-linkedin");
+    const shareTelegram = document.getElementById("share-telegram");
+    const shareCopy = document.getElementById("share-copy");
 
     let currentPosts = [];
     let currentIndex = -1;
@@ -254,6 +313,11 @@
         if (date) date.innerText = new Date(data.date).toLocaleDateString();
         if (category) category.innerText = data.category;
 
+        // Actualizar URL Hash si hay slug
+        if (data.slug) {
+            window.history.pushState(null, '', '#' + data.slug);
+        }
+
         // Update nav buttons visibility
         if (prevBtn) prevBtn.classList.toggle("disabled", index === 0);
         if (nextBtn)
@@ -269,6 +333,8 @@
         setTimeout(() => {
             modal.classList.remove("active", "closing");
             document.body.style.overflow = "auto";
+            // Limpiar hash al cerrar
+            window.history.pushState(null, '', window.location.pathname);
         }, 300);
     };
 
@@ -280,6 +346,48 @@
         modal.classList.remove("closing");
         modal.classList.add("active");
         document.body.style.overflow = "hidden";
+    };
+
+    // Compartir
+    shareLinkedin?.addEventListener("click", () => {
+        const data = currentPosts[currentIndex];
+        const url = encodeURIComponent(window.location.href);
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+    });
+
+    shareTelegram?.addEventListener("click", () => {
+        const data = currentPosts[currentIndex];
+        const url = encodeURIComponent(window.location.href);
+        const text = encodeURIComponent(data.copy || data.title);
+        window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
+    });
+
+    shareCopy?.addEventListener("click", () => {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            const btn = shareCopy;
+            const originalColor = btn.style.color;
+            btn.style.color = "var(--accent)";
+            setTimeout(() => btn.style.color = originalColor, 2000);
+            alert("¡Enlace copiado al portapapeles!");
+        });
+    });
+
+    // Carga inicial por Hash
+    const handleInitialHash = () => {
+        const hash = window.location.hash.substring(1);
+        if (!hash) return;
+
+        // Necesitamos esperar a que el grid esté cargado para tener los datos
+        const checkGrid = setInterval(() => {
+            const items = document.querySelectorAll('.grid-item');
+            if (items.length > 0) {
+                clearInterval(checkGrid);
+                const item = Array.from(items).find(el => el.getAttribute('data-slug') === hash);
+                if (item) {
+                    item.dispatchEvent(new Event('click', { bubbles: true }));
+                }
+            }
+        }, 100);
     };
 
     // Expose globally
@@ -308,4 +416,8 @@
         if (e.key === "ArrowLeft") updateModalDisplay(currentIndex - 1);
         if (e.key === "ArrowRight") updateModalDisplay(currentIndex + 1);
     });
+
+    // Iniciar detección de hash
+    handleInitialHash();
+    document.addEventListener("astro:page-load", handleInitialHash);
 </script>

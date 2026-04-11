@@ -1,11 +1,6 @@
 ---
 import { getCollection } from "astro:content";
-const now = new Date();
-const posts = await getCollection("posts", ({ data }) => {
-    const isPublished = data.published;
-    const isDatePassed = data.date.getTime() <= now.getTime();
-    return isPublished && isDatePassed;
-});
+const posts = await getCollection("posts", ({ data }) => data.published);
 ---
 
 <section id="grid" class="container">
@@ -15,6 +10,7 @@ const posts = await getCollection("posts", ({ data }) => {
                 <div
                     class="grid-item"
                     data-post={JSON.stringify(post.data)}
+                    data-slug={post.id}
                     data-index={index}
                 >
                     <div class="meme-wrapper">
@@ -181,17 +177,24 @@ const posts = await getCollection("posts", ({ data }) => {
             const item = (e.target as HTMLElement).closest(".grid-item");
             if (item) {
                 const index = parseInt(item.getAttribute("data-index") || "0");
+                const slug = item.getAttribute("data-slug");
                 const allItems = container.querySelectorAll(".grid-item");
-                const postsData = Array.from(allItems).map((el) =>
-                    JSON.parse(el.getAttribute("data-post") || "{}"),
-                );
+                const postsData = Array.from(allItems).map((el) => {
+                    const data = JSON.parse(el.getAttribute("data-post") || "{}");
+                    return { ...data, slug: el.getAttribute("data-slug") };
+                });
 
-                console.log("Opening modal at index:", index);
+                console.log("Opening modal at index:", index, "slug:", slug);
+
+                // Update URL hash without reload
+                if (slug) {
+                    window.history.pushState(null, '', '#' + slug);
+                }
 
                 const detail = { posts: postsData, currentIndex: index };
 
-                if (window.openMemeModal) {
-                    window.openMemeModal(detail);
+                if ((window as any).openMemeModal) {
+                    (window as any).openMemeModal(detail);
                 } else {
                     window.dispatchEvent(
                         new CustomEvent("open-modal", { detail }),
