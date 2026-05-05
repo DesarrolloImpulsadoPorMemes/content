@@ -4,7 +4,10 @@ import { SITE } from "../config";
 import SEO from "../components/SEO.astro";
 import "../index.css";
 
-const allPosts = await getCollection("posts", ({ data }) => data.published);
+const now = new Date();
+const allPosts = await getCollection("posts", ({ data }) => {
+    return data.published && data.date.getTime() <= now.getTime();
+});
 const randomMeme = allPosts[Math.floor(Math.random() * allPosts.length)];
 ---
 

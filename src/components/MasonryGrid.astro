@@ -1,6 +1,9 @@
 ---
 import { getCollection } from "astro:content";
-const posts = await getCollection("posts", ({ data }) => data.published);
+const now = new Date();
+const posts = (await getCollection("posts", ({ data }) => {
+    return data.published && data.date.getTime() <= now.getTime();
+})).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
 <section id="grid" class="container">

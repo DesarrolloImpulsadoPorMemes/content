@@ -2,7 +2,10 @@
 import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
-    const posts = await getCollection("posts");
+    const now = new Date();
+    const posts = await getCollection("posts", ({ data }) => {
+        return data.published && data.date.getTime() <= now.getTime();
+    });
     return posts.map((post) => ({
         params: { slug: post.id },
         props: { post },
